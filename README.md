@@ -2,9 +2,9 @@
 
 ## Description
 
-A .Net Standard library containing 2 Rebus Steps that are used to be added in the Rebus pipeline as middlewares.
+A .Net Standard library containing two Rebus Steps that are used to be added in the Rebus pipeline as middlewares.
 
-The 2 steps are:
+The two steps are:
 - `RebusSetTracingHeadersStep` is an outgoing step that is used in the message producers to set the outgoing headers of the Rebus message. The headers are the 3 important headers used by Datadog <br/>
  
  TraceId | SpanId (ParentId) | SamplingPriority
