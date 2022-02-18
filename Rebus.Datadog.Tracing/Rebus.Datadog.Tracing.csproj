@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="Datadog.Trace" Version="2.2.0" />
-    <PackageReference Include="Rebus" Version="6.6.2" />
+    <PackageReference Include="Rebus" Version="5.1.0" />
   </ItemGroup>
 
 </Project>
