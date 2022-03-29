@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Datadog.Trace;
 using Rebus.Bus;
@@ -22,7 +23,7 @@ namespace Rebus.Datadog.Tracing
 		{
 			using (var scope = Tracer.Instance.StartActive("RebusTracingHeaderStep.Process"))
 			{
-				var message = context.Load<Message>();
+				Message message = context?.Load<Message>();
 				var headers = message?.Headers;
 				var activeSpan = scope.Span;
 
@@ -30,7 +31,7 @@ namespace Rebus.Datadog.Tracing
 
 				if (headers != null)
 				{
-					headers[HttpHeaderNames.TraceId] = activeSpan.TraceId.ToString();
+					SetTraceId(headers, activeSpan);
 					headers[HttpHeaderNames.ParentId] = activeSpan.SpanId.ToString();
 					headers[HttpHeaderNames.SamplingPriority] = activeSpan.GetTag(Tags.SamplingPriority);
 
@@ -41,6 +42,16 @@ namespace Rebus.Datadog.Tracing
 				{
 					await next().ConfigureAwait(false);
 				}
+			}
+		}
+
+		private static void SetTraceId(Dictionary<string, string> headers, ISpan activeSpan)
+		{
+			bool traceIdExists = headers.TryGetValue(HttpHeaderNames.TraceId, out string existingTraceId);
+
+			if (!traceIdExists || string.IsNullOrWhiteSpace(existingTraceId))
+			{
+				headers[HttpHeaderNames.TraceId] = activeSpan.TraceId.ToString();
 			}
 		}
 	}

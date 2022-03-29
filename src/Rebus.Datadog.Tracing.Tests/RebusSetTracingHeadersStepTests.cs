@@ -28,7 +28,7 @@ namespace Rebus.Datadog.Tracing.Tests
 		}
 
 		[Fact]
-		public async void ShouldPopulateTracingHeaders_WhenCallingProcess()
+		public async void ShouldPopulateTraceIdWhenItDoesNotExist_WhenCallingProcess()
 		{
 			var headers = new Dictionary<string, string>()
 			{
@@ -43,6 +43,28 @@ namespace Rebus.Datadog.Tracing.Tests
 			Assert.NotNull(headers[HttpHeaderNames.TraceId]);
 			Assert.NotNull(headers[HttpHeaderNames.ParentId]);
 			Assert.NotNull(headers[HttpHeaderNames.SamplingPriority]);
+		}
+
+		[Fact]
+		public async void ShouldNotOverrideTraceIdWhenItExists_WhenCallingProcess()
+		{
+			var traceId = "testTraceId";
+
+			var headers = new Dictionary<string, string>()
+			{
+				{"rbs2-msg-id", messageId },
+				{"x-datadog-trace-id", traceId }
+			};
+			var transportMessage = new Message(headers, new byte[10]);
+			var incomingStepContext = new OutgoingStepContext(transportMessage, CreateTransactionContext(), _destinationAddresses);
+
+			await _underTest.Process(incomingStepContext, Next);
+
+			Assert.Equal(1, _nbrOfCalls);
+			Assert.NotNull(headers[HttpHeaderNames.TraceId]);
+			Assert.NotNull(headers[HttpHeaderNames.ParentId]);
+			Assert.NotNull(headers[HttpHeaderNames.SamplingPriority]);
+			Assert.Equal(traceId, headers[HttpHeaderNames.TraceId]);
 		}
 	}
 }
