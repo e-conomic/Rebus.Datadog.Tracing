@@ -13,7 +13,7 @@ namespace Rebus.Datadog.Tracing
 	{
 		private const int SpanIdLength = 19;
 
-		private readonly ILog _logger;
+		private readonly ILog _logger; 
 
 		public RebusLinkTracingHeaderStep(IRebusLoggerFactory rebusLoggerFactory)
 		{
