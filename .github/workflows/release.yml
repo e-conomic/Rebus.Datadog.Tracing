@@ -1,0 +1,32 @@
+name: Release
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  build_and_publish:
+    name: Build and publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Generate version
+        id: package_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+          source-url: https://api.nuget.org/v3/index.json
+          NUGET_AUTH_TOKEN: ${{ secrets.NUGET_APIKEY }}
+
+      - name: Generate NuGet packages
+        run: dotnet pack ./src/Rebus.Datadog.Tracing/ -o ./nuget -c Release --include-source -p:PackageVersion=${{ steps.package_version.outputs.VERSION }}
+
+      - name: Publish NuGet package
+        run: dotnet nuget push ./nuget/Rebus.Datadog.Tracing.${{ steps.package_version.outputs.VERSION  }}.nupkg
