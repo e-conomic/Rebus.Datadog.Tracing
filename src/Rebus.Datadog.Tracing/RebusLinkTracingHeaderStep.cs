@@ -34,7 +34,7 @@ namespace Rebus.Datadog.Tracing
 				return;
 			}
 
-			var traceId = GetTraceId(message);
+			ulong? traceId = GetTraceId(message);
 
 			if (traceId == null)
 			{
@@ -56,10 +56,10 @@ namespace Rebus.Datadog.Tracing
 
 		private SpanCreationSettings GenerateSpanContext(TransportMessage message, ulong? traceId)
 		{
-			var spanId = GetSpanId(message);
+			ulong spanId = GetSpanId(message);
 			var samplingPriority = GetSamplingPriority(message);
 
-			return new SpanCreationSettings() 
+			return new SpanCreationSettings()
 			{
 				FinishOnClose = true,
 				Parent = new SpanContext(traceId, spanId, samplingPriority),
@@ -68,7 +68,7 @@ namespace Rebus.Datadog.Tracing
 
 		private ulong GetSpanId(TransportMessage message)
 		{
-			var parentSpanIdExists = message.Headers.TryGetValue(HttpHeaderNames.ParentId, out string parentSpanId);
+			bool parentSpanIdExists = message.Headers.TryGetValue(HttpHeaderNames.ParentId, out string parentSpanId);
 			if (parentSpanIdExists && ulong.TryParse(parentSpanId, out ulong parentSpanIdLong))
 			{
 				return parentSpanIdLong;
@@ -81,7 +81,7 @@ namespace Rebus.Datadog.Tracing
 
 		private static ulong? GetTraceId(TransportMessage message)
 		{
-			var traceIdExists = message.Headers.TryGetValue(HttpHeaderNames.TraceId, out string traceId);
+			bool traceIdExists = message.Headers.TryGetValue(HttpHeaderNames.TraceId, out string traceId);
 			if (traceIdExists && ulong.TryParse(traceId, out ulong traceIdLong))
 			{
 				return traceIdLong;
@@ -92,7 +92,7 @@ namespace Rebus.Datadog.Tracing
 
 		private static SamplingPriority? GetSamplingPriority(TransportMessage message)
 		{
-			var samplingPriorityExists = message.Headers.TryGetValue(HttpHeaderNames.SamplingPriority, out string samplingPriority);
+			bool samplingPriorityExists = message.Headers.TryGetValue(HttpHeaderNames.SamplingPriority, out string samplingPriority);
 			if (samplingPriorityExists && Enum.TryParse(samplingPriority, out SamplingPriority samplingPriorityType))
 			{
 				return samplingPriorityType;
