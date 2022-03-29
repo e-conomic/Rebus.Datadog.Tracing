@@ -34,7 +34,7 @@ If this library ends up to be useful, we will create one version for each corres
 
 ### Consumer
 ```
-.Options(o => o..Decorate<IPipeline>(c =>
+.Options(o => o.Decorate<IPipeline>(c =>
 			{
 				var pipeline = c.Get<IPipeline>();
 				var step = new RebusLinkTracingHeaderStep(c.Get<IRebusLoggerFactory>());
