@@ -27,6 +27,6 @@ jobs:
         run: dotnet pack ./src/Rebus.Datadog.Tracing/ -o ./nuget -c Release --include-source -p:PackageVersion=${{ steps.package_version.outputs.VERSION }}
 
       - name: Publish NuGet package
-        run: dotnet nuget push ./nuget/Rebus.Datadog.Tracing.${{ steps.package_version.outputs.VERSION }}.nupkg -s https://api.nuget.org/v3/index.json
+        run: dotnet nuget push ./nuget/Rebus.Datadog.Tracing.${{ steps.package_version.outputs.VERSION }}.nupkg -k $NUGET_AUTH_TOKEN -s https://api.nuget.org/v3/index.json
         env:
           NUGET_AUTH_TOKEN: ${{ secrets.NUGET_APIKEY }}
