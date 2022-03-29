@@ -16,7 +16,7 @@ namespace Rebus.Datadog.Tracing
 		private readonly ILog _logger; 
 
 		public RebusLinkTracingHeaderStep(IRebusLoggerFactory rebusLoggerFactory)
-		{
+		{ 
 			_logger = rebusLoggerFactory?.GetLogger<RebusLinkTracingHeaderStep>() ?? throw new ArgumentNullException(nameof(rebusLoggerFactory));
 		}
 
