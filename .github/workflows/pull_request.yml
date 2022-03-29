@@ -20,11 +20,19 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: "3.1.x"
+          dotnet-version: 6.0.x
+
+      - name: Restore dependencies
+        working-directory: src
+        run: dotnet restore
+
+      - name: Check formatting
+        working-directory: src
+        run: dotnet format --no-restore --verify-no-changes
 
       - name: Build solution
         working-directory: src
-        run: dotnet build
+        run: dotnet build --no-restore
 
       - name: Run tests
         working-directory: src
