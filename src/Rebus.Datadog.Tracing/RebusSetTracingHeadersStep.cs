@@ -37,7 +37,10 @@ namespace Rebus.Datadog.Tracing
 					_logger.Debug($"MessageId {message?.GetMessageId()} has traceId set to {activeSpan.TraceId}");
 				}
 
-				await next().ConfigureAwait(false);
+				if (next != null)
+				{
+					await next().ConfigureAwait(false);
+				}
 			}
 		}
 	}
