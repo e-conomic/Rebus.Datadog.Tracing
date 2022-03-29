@@ -22,12 +22,11 @@ jobs:
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: 6.0.x
-          source-url: https://api.nuget.org/v3/index.json
-        env:
-          NUGET_AUTH_TOKEN: ${{ secrets.NUGET_APIKEY }}
 
       - name: Generate NuGet packages
         run: dotnet pack ./src/Rebus.Datadog.Tracing/ -o ./nuget -c Release --include-source -p:PackageVersion=${{ steps.package_version.outputs.VERSION }}
 
       - name: Publish NuGet package
         run: dotnet nuget push ./nuget/Rebus.Datadog.Tracing.${{ steps.package_version.outputs.VERSION }}.nupkg
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.NUGET_APIKEY }}
