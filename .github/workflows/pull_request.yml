@@ -1,0 +1,31 @@
+name: Pull request
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+env:
+  DOTNET_NOLOGO: 1
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+
+jobs:
+  build_and_test:
+    name: Build and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "3.1.x"
+
+      - name: Build solution
+        working-directory: src
+        run: dotnet build
+
+      - name: Run tests
+        working-directory: src
+        run: dotnet test --no-build --no-restore
