@@ -11,8 +11,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Datadog.Trace" Version="2.24.1" />
-        <PackageReference Include="Rebus" Version="7.0.0" />
+        <PackageReference Include="Datadog.Trace" Version="3.3.1" />
+        <PackageReference Include="Rebus" Version="8.1.0" />
     </ItemGroup>
 
 </Project>
