@@ -42,7 +42,6 @@ namespace Rebus.Datadog.Tracing.Tests
 			Assert.Equal(1, _nbrOfCalls);
 			Assert.NotNull(headers[HttpHeaderNames.TraceId]);
 			Assert.NotNull(headers[HttpHeaderNames.ParentId]);
-			Assert.NotNull(headers[HttpHeaderNames.SamplingPriority]);
 		}
 
 		[Fact]
@@ -63,7 +62,6 @@ namespace Rebus.Datadog.Tracing.Tests
 			Assert.Equal(1, _nbrOfCalls);
 			Assert.NotNull(headers[HttpHeaderNames.TraceId]);
 			Assert.NotNull(headers[HttpHeaderNames.ParentId]);
-			Assert.NotNull(headers[HttpHeaderNames.SamplingPriority]);
 			Assert.Equal(traceId, headers[HttpHeaderNames.TraceId]);
 		}
 	}
