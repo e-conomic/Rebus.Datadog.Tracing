@@ -5,6 +5,10 @@ on:
     types:
       - published
 
+concurrency:
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
   build_and_publish:
     name: Build and publish
@@ -17,6 +21,12 @@ jobs:
       - name: Generate version
         id: package_version
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
+      - name: Check nuget version availability
+        uses: e-conomic/github-actions/nuget-version-check@v46
+        with:
+          name: "Rebus.Datadog.Tracing"
+          version: ${{ steps.package_version.outputs.VERSION }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
