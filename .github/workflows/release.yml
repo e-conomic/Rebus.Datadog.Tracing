@@ -9,6 +9,9 @@ concurrency:
   group: ${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
+env:
+  PACKAGE_NAME: "Rebus.Datadog.Tracing"
+
 jobs:
   build_and_publish:
     name: Build and publish
@@ -23,10 +26,34 @@ jobs:
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
 
       - name: Check nuget version availability
-        uses: e-conomic/github-actions/nuget-version-check@v46
-        with:
-          name: "Rebus.Datadog.Tracing"
-          version: ${{ steps.package_version.outputs.VERSION }}
+        shell: bash
+        run: |
+          PACKAGE_NAME_LOWER="${PACKAGE_NAME,,}"
+          response=$(curl -i "https://api.nuget.org/v3/registration5-semver1/${PACKAGE_NAME_LOWER}/${{ steps.package_version.outputs.VERSION }}.json")
+
+          echo "::group::API Response"
+          echo "$response"
+          echo "::endgroup::"
+
+          status_code=$(echo "$response" | head -n1 | awk '{print $2}')
+
+          if [ "$status_code" = "404" ]; then
+            echo "Request failed with status: $status_code"
+            echo "Nuget package '${{ env.PACKAGE_NAME }}' does not have version '${{ steps.package_version.outputs.VERSION }}'"
+            echo "It's safe to proceed"
+            exit 0
+          fi
+
+          if [ "$status_code" = "200" ]; then
+            echo "Request succeeded with status: $status_code"
+            echo "Nuget package '${{ env.PACKAGE_NAME }}' has version '${{ steps.package_version.outputs.VERSION }}'"
+            echo "Execution will halt to prevent overwriting the package version"
+            exit 1
+          fi
+
+          echo "Request failed with status: $status_code"
+          echo "Execution will halt due to an unexpected error code"
+          exit 2
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -34,9 +61,9 @@ jobs:
           dotnet-version: 6.0.x
 
       - name: Generate NuGet packages
-        run: dotnet pack ./src/Rebus.Datadog.Tracing/ -o ./nuget -c Release --include-source -p:PackageVersion=${{ steps.package_version.outputs.VERSION }}
+        run: dotnet pack ./src/${{ env.PACKAGE_NAME }}/ -o ./nuget -c Release --include-source -p:PackageVersion=${{ steps.package_version.outputs.VERSION }}
 
       - name: Publish NuGet package
-        run: dotnet nuget push ./nuget/Rebus.Datadog.Tracing.${{ steps.package_version.outputs.VERSION }}.nupkg -k $NUGET_AUTH_TOKEN -s https://api.nuget.org/v3/index.json
+        run: dotnet nuget push ./nuget/${{ env.PACKAGE_NAME }}.${{ steps.package_version.outputs.VERSION }}.nupkg -k $NUGET_AUTH_TOKEN -s https://api.nuget.org/v3/index.json
         env:
           NUGET_AUTH_TOKEN: ${{ secrets.NUGET_APIKEY }}
